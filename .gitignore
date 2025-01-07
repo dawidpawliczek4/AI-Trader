@@ -1,0 +1,8 @@
+venv/
+
+data/credentials.txt
+
+__pycache__/
+*.pyc
+*.vscode/
+*.python-version
