@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 from tvDatafeed import TvDatafeed, Interval
+import mplfinance as mpf
 
 def get_creds(path):
     if os.path.exists(path):
@@ -63,14 +64,9 @@ def fetch_and_plot_data(tv):
             return
         print(f"Got {len(data)} candles for {symbol} from {exchange} on interval {interval.name}.")
         
-        plt.figure(figsize=(12, 6))
-        plt.plot(data['close'], label='Close Price')
-        plt.title(f'{symbol} Closing Prices')
-        plt.xlabel('Time')
-        plt.ylabel('Price')
-        plt.legend()
-        plt.grid(True)
-        plt.show()
+        mc = mpf.make_marketcolors(up='g', down='r', inherit=True)
+        s = mpf.make_mpf_style(marketcolors=mc)
+        mpf.plot(data, type='candle', style=s, title=f'{symbol} Candlestick Chart', volume=False)
     except Exception as e:
         print(f"Error while downloading data: {e}")
 
