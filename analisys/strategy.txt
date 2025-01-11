@@ -1,0 +1,30 @@
+Miałem taki pomysł żeby modelami klasyfikacyjnymi określić prawdopodobieństwa spadku lub wzrostu na krótkim odstepie czasu. 
+Dzięki temu będzie znacznie łatwiej w gradiencie znalezc lepsze minima, i odpalimy na tym regresje, która określi nam przewidywaną wartośc wzrostu
+Chcemy zmierzyć wartość akcji za 4 słupki.
+
+
+Modele:
+
+Klasyfikacja: (output: 1 - jeśli wzrośnie za 4 słupki, 0 jeśli zmaleje za 4 słupki)
+    - Analiza sentymentu newsow 
+    - Logistic Regression
+    - KNN?
+    - Random Forest
+    - XG Boost
+    - CNN?
+    - NN?
+    - SVM (jeśli dane są bardziej separowalne)
+
+Regresja:  (output: wartosc która da nam cene akcji za 4 słupki, skorelowana z wynikiem klasyfikacji)
+    - NN
+    - RNN (Long Short-Term Memory)
+    - CNN
+    - Random Forest Regressor
+    - XG Boost (podobno dobre w regresji szeregów czasowych)
+
+
+
+Jak połączyć modele odpowiedzialne za klasyfikacje?
+- Można wziąć najczęściej występujący wynik z wszystkich modeli.
+- Można też wynik każdego pomnożyć razy jego skuteczność(np. accuracy lub jakiś inny wyznacznik) i wziąć z tego średnią ważoną (pewnie lepsze) 
+- Stacking - Że robimy następny model, który uczy się dawać dobry output z outputów modeli z klasyfikacji (np. Random Forest)
