@@ -1,5 +1,5 @@
 from typing import List
-import data_preprocessing as dp
+from nlp.data_preprocessing import punctuation_removal, stem
 import nltk
 from nltk.data import find
 import spacy 
@@ -98,7 +98,7 @@ class Tokenizer:
                 np.array 300x1
         '''
         
-        return self.nlp(text)
+        return self.nlp(text).vector
         
         
             
@@ -111,8 +111,8 @@ class Tokenizer:
                 str
         '''
         
-        text = dp.punctuation_removal(text)
+        text = punctuation_removal(text)
         text = text.replace('amp', '').lower()
-        text = dp.stem(text)
+        text = stem(text)
         return text
     

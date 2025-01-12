@@ -1,5 +1,9 @@
 import nltk
-nltk.download('wordnet')
+
+try:
+    nltk.data.find('wordnet')
+except: 
+    nltk.download('wordnet')
 
 from nltk.stem import PorterStemmer
 stemmer = PorterStemmer()
