@@ -1,3 +1,9 @@
 kagglehub
 numpy
 pandas
+nltk
+scikit-learn
+torch
+matplotlib
+kagglehub
+spacy

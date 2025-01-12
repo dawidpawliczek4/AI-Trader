@@ -2,7 +2,6 @@
 
 ---
 
-<!-- pozdro dla ludzi co czytają surowego markdowna -->
 
 <!-- TODO dodaj dobry zarys i opis modułu  -->
 
@@ -10,25 +9,26 @@
 
 1. data preprocessing
     * **stopwords removal**: removing "this", "that", "he", "it"... from sentences
-    * **lemmatization**: grouping together different inflected forms of the same word eg: changing, changed -> change
+    * **stemming**: grouping together different inflected forms of the same word eg: changing, changed -> change
     * **lowercase conversion**
 
 2. transformation word into data
+    * **index based encoding**
     * **bag of words**
-    * **TF-IDF**
+    * **TF-IDF**  <!-- TODO -->
     * **embedding** (Word2Vec, GloVe, FastText)
-    * **language models** (BERT, GPT)
+    * **BERT ENcoding**: using language models for encoding <!-- TODO -->
 
 3. model developing
     * **NN**
-    * **recurrent NN**
-    * **short-long term memory**
-    * **knn**
-    * **logistic regression**
-    * **transformers**
+    * **knn regression**
+    * **decition trees regression**
+    * **linear regression**
+    * **recurrent NN** <!-- TODO -->
+    * **transformers** <!-- TODO -->
 
 4. model evaluation
-    <!-- TODO dodaj metryki -->
+    * **MAE**: mean absolutive error
 
 5. using model for predictions 
     text processing and predictiong the sentiment 
