@@ -92,13 +92,13 @@ class Sentiment_analyzer():
             self.y_train = torch.tensor(self.y_train, dtype=torch.float32).view(-1, 1)
             
             if self.text_transformation == self.tokenizer.ibe_text:
-                self.model = Nn_regression([self.SEQUENCE_LEN, 500, 100, 1])
+                self.model = Nn_regression([self.SEQUENCE_LEN, 500, 100, 1], epochs=2000)
                 
             elif self.text_transformation == self.tokenizer.bow_text:
-                self.model = Nn_regression([5000, 1000, 100, 1])
+                self.model = Nn_regression([5000, 100, 50, 1], epochs=2000)
                 
             elif self.text_transformation == self.tokenizer.word2vec_text:
-                self.model = Nn_regression([300, 100, 100, 1])
+                self.model = Nn_regression([300, 100, 100, 1], epochs=2000)
             
         # train model
         self.model.fit(self.X_train, self.y_train)

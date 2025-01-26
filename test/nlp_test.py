@@ -8,8 +8,8 @@ sys.path.append(os.path.abspath('..'))
 
 from nlp import Sentiment_analyzer
 
-word_transformations = ['ibe', 'bow', 'word2vec']
-models = ['decision_tree_regression', 'knn_regression', 'linear_regression']
+word_transformations = ['bow', 'word2vec']
+models = ['nn']
 
 for wt in word_transformations:
     for model in models:
