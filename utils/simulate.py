@@ -7,6 +7,30 @@ from tvDatafeed import TvDatafeed, Interval
 from pytz import timezone
 import exchange_calendars as ecals
 from dotenv import load_dotenv
+from dateutil import parser
+
+'''
+    req from simulate to tactic, it will be dictionary with keys:
+        required (always present):
+            time: datatime - current datatime
+            symbol: str - ticker symbol
+            exchange: str - stock name
+            account_balance: float
+            shares: float
+            
+        optional (if they arent defined they won't be passed to tactic):
+            stop_loss: float - current stop_loss
+'''
+
+'''
+    res to simulare from tactic, it will be dictionary with keys:
+        required (always present):
+            action: str - "buy", "sell" or "hold"
+        optional:
+            quantity: float - if action is different than "hold" this key is required
+            set_stop_loss : float | None - if passed simulation will set stop-loss, if you will pass None stop-loss will be removed
+'''
+
 
 class simulate:
     '''
@@ -19,6 +43,7 @@ class simulate:
                 * tactic: function for making decisions
                 * symbol: ticker 
                 * exchange: stock name
+                * stop-loss: flaot if you want to set it, none if not
             
             input for version on historical data (2021 year):
                 * live: bool = False 
@@ -28,13 +53,11 @@ class simulate:
                 * tactic: function for making decisions
                 * symbol: ticker
                 * exchange: stock name
+                * stop-loss: flaot if you want to set it, none if not
                 
-            tactic: 
-                * receive (time, symbol, exchange, accout_ballance, shares)
-                * have to return one of 3 options:
-                    * ("buy", quantity)
-                    * ("sell", quantity)
-                    * ("hold", 0)
+            tactic - function that: 
+                * receive req
+                * have to return res
                     
             important info: 
                 * we assume that we are in the et timezone. so proper example of datatime is (2021-01-04 04:00:00-05:00) or (2021-03-24 08:00:00-04:00)
@@ -43,7 +66,7 @@ class simulate:
     accout_ballance = 100000
     shares = 0
     
-    def __init__(self, live: bool, symbol: str, exchange: str, tactic, n_bars: int = None, interval: Interval = None, t0: datetime = None, t1: datetime = None, delta: timedelta = None):
+    def __init__(self, live: bool, symbol: str, exchange: str, tactic, stop_loss: float = None, n_bars: int = None, interval: Interval = None, t0: datetime = None, t1: datetime = None, delta: timedelta = None):
         load_dotenv()
         
         # set data
@@ -55,6 +78,7 @@ class simulate:
             self.symbol = symbol
             self.exchange = exchange
             self.delta = self.timedeltaOfInterval(interval)
+            self.stop_loss = stop_loss
             
         else: 
             self.live = live 
@@ -64,6 +88,7 @@ class simulate:
             self.tactic = tactic 
             self.symbol = symbol 
             self.exchange = exchange
+            self.stop_loss = stop_loss
         
         # cook dataset 
         self.cook_stock_dataset()
@@ -110,14 +135,16 @@ class simulate:
             return False
 
         open_time, close_time = calendar.session_open_close(date.date())
+        open_time, close_time = open_time.astimezone("US/Eastern"), close_time.astimezone("US/Eastern")
         return open_time.time() <= date.time() <= close_time.time()
     
-    def simulate_offline(self):
+    def simulate(self):
         '''
             method for evaluation our tactic, return accout_ballance and shares at time t1
         '''
+        
         while self.t0 < self.t1: 
-            if not (4 <= self.t0.hour <= 18): # market is closed
+            if not self.is_nasdaq_open(self.t0): # market is closed
                 self.t0 += self.delta
                 continue
                 
@@ -125,25 +152,39 @@ class simulate:
                 self.t0 += self.delta
                 continue
             
-            action, quantity = self.tactic(self.t0, self.symbol, self.exchange, self.accout_ballance, self.shares)
-            if action == 'buy':
-               if quantity <= 0:
+            if self.stop_loss and self.price_df[self.price_df['date'] >= self.to].iloc[0] <= self.stop_loss:
+                self.accout_ballance += self.shares * self.stop_loss
+                self.shares = 0
+            
+            req = {
+                "time": self.t0, 
+                "symbol": self.symbol,
+                "exchange": self.exchange, 
+                "account_balance": self.accout_ballance,
+                "shares": self.shares
+            }
+            if self.stop_loss != None:
+                req["stop_loss"] = self.stop_loss
+                
+            res = self.tactic(req)
+            if res['action'] == 'buy':
+               if res['quantity'] <= 0:
                    continue 
                 
                item = self.price_df[self.price_df['date'] >= self.t0].iloc[0]
                price = (item.high + item.low) / 2
-               buy = min(price * quantity, self.accout_ballance)
+               buy = min(price * res['quantity'], self.accout_ballance)
                
                self.shares += buy 
-               self.accout_ballance -= price * quantity
+               self.accout_ballance -= price * res['quantity']
                
-            elif action == 'sell':
-                if quantity <= 0 or self.shares <= 0:
+            elif res['quantity'] == 'sell':
+                if res['quantity'] <= 0 or self.shares <= 0:
                     continue
                 
                 item = self.price_df[self.price_df['date'] >= self.t0].iloc[0]
                 price = (item.high + item.low) / 2
-                sell = min(quantity, self.shares)
+                sell = min(res['quantity'], self.shares)
                 
                 self.shares -= sell
                 self.accout_ballance += sell * price
@@ -152,8 +193,43 @@ class simulate:
             
         return (self.accout_ballance, self.shares)
     
-    def simulate_live(self):
-        pass
+    def convert_time_format(time_str):
+        cleaned_time = " ".join(time_str.split())
+        dt = parser.parse(cleaned_time)
+        et = timezone("US/Eastern")
+        return dt.replace(tzinfo=et) 
+    
+    def cook_news_dataset(self):
+        if self.live == False:
+            pass                        #TODO
+        else:
+            path = kagglehub.dataset_download("notlucasp/financial-news-headlines")
+            
+            csv1 = os.path.join(path, 'cnbc_headlines.csv')
+            csv2 = os.path.join(path, 'guardian_headlines.csv')
+            csv3 = os.path.join(path, 'reuters_headlines.csv')
+
+            df1 = pd.read_csv(csv1)
+            df2 = pd.read_csv(csv2)
+            df3 = pd.read_csv(csv3)
+            
+            # cook df1
+            df1 = df1.drop(columns=['Description']).dropna()
+            df1['Time'] = df1['Time'].apply(self.convert_time_format)
+            
+            # cook df2
+            df2 = df2.dropna()
+            df2['Time'] = df2['Time'].apply(self.convert_time_format)
+            
+            # cook df3
+            df3 = df3.drop(columns=['Description']).dropna()
+            df3['Time'] = df3['Time'].apply(self.convert_time_format)
+            
+            # merge
+            df = pd.concat([df1, df2, df3])
+            df = df.sort_values(by="Time").reset_index(drop=True)
+            self.news_df['Headlines'] = df['Headlines'].apply(lambda s : s.replace('\n\n\n', ''))
+            df.to_csv('../data/news.csv', index=False)
             
     def cook_stock_dataset(self):
         if self.live == False:
@@ -161,6 +237,8 @@ class simulate:
             csv = os.path.join(path, '2021', self.symbol + '.csv')
             self.price_df = pd.read_csv(csv)
             self.price_df['date'] = pd.to_datetime(self.price_df['date'])
+            self.price_df = self.price_df[self.price_df['date'].apply(self.is_nasdaq_open)].reset_index(drop = True)
+            self.price_df = self.price_df.drop(columns=['ticker', 'name'])
             self.price_df.to_csv('../data/stock.csv', index=False)
             
         else:
@@ -174,7 +252,8 @@ class simulate:
             self.price_df.rename(columns={'datetime': 'date'}, inplace=True)
             self.price_df['date'] = pd.to_datetime(self.price_df['date'])
             self.price_df['date'] = self.price_df['date'] - timedelta(hours=1)
-            self.price_df['date'] = self.price_df['date'].apply(lambda dt: dt.replace(tzinfo=timezone("US/Eastern")))
+            self.price_df['date'] = self.price_df['date'].apply(lambda dt: dt.replace(tzinfo=timezone("UTC")))
+            self.price_df['date'] = self.price_df['date'].apply(lambda dt: dt.astimezone("US/Eastern"))
             self.price_df.to_csv('../data/stock.csv', index=False)
             
             self.t0 = self.price_df['date'].iloc[0]
