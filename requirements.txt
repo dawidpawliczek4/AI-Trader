@@ -1,7 +1,8 @@
-#pandas
-#numpy
-#scikit-learn
-#tensorflow
-#matplotlib
+pandas
+numpy
+scikit-learn
+matplotlib
+xgboost
 mplfinance
+seaborn
 git+https://github.com/rongardF/tvdatafeed.git
