@@ -16,6 +16,25 @@ def cook_dataset(symbol, exchange):
     df = tv.get_hist(symbol=symbol, exchange=exchange, interval=interval, n_bars=n_bars)
     df = df.drop(columns=['symbol'])
 
+    def compute_rsi(series, window=14):
+        delta = series.diff()
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+
+        avg_gain = gain.rolling(window=window, min_periods=1).mean()
+        avg_loss = loss.rolling(window=window, min_periods=1).mean()
+
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+        return rsi
+
+    def compute_macd(series, short=12, long=26, signal=9):
+        ema_short = series.ewm(span=short, adjust=False).mean()
+        ema_long = series.ewm(span=long, adjust=False).mean()
+        macd_line = ema_short - ema_long
+        signal_line = macd_line.ewm(span=signal, adjust=False).mean()
+        return macd_line, signal_line
+
     def compute_bollinger_bands(series, window=20, num_std=2):
         sma = series.rolling(window=window).mean()
         std_dev = series.rolling(window=window).std()
@@ -24,6 +43,10 @@ def cook_dataset(symbol, exchange):
         return sma, upper_band, lower_band
 
     def compute_features(df):
+        # Compute RSI
+        df['RSI'] = compute_rsi(df['close'])
+        df['RSI_Change'] = df['RSI'].diff()
+
         # Compute Bollinger Bands
         df['SMA_20'], df['Bollinger_Upper'], df['Bollinger_Lower'] = compute_bollinger_bands(df['close'])
         df['SMA_10'] = df['close'].rolling(10).mean()
@@ -50,15 +73,18 @@ def cook_dataset(symbol, exchange):
         df['Volatility_20_Days'] = df['close'].pct_change().rolling(window=20).std() * 100
 
         # Target Value
-        df['Mean_5_Days_Ahead'] = df['close'].shift(-10).rolling(window=10, min_periods=1).mean()
-        df['Target'] = (df['Mean_5_Days_Ahead'] - df['close']) / df['close'] * 100
+        df['Mean_10_Days_Ahead'] = df['close'].shift(-10).rolling(window=10, min_periods=1).mean()
+        df['Target'] = (df['Mean_10_Days_Ahead'] - df['close']) / df['close'] * 100
+
+        # Drop raw unbounded features
+        df = df.drop(columns=['SMA_10', 'SMA_5'])
 
         return df
 
     df = compute_features(df)
     df = df.dropna()
 
-    wanted_features = ['Volatility_10_Days', 'Volatility_20_Days', 'Normalized_MACD', 'SMA_Crossover', 'SMA_10_Distance'] 
+    wanted_features = ['SMA_Crossover', 'RSI' ,'Volatility_10_Days', 'Volatility_20_Days'] 
     data = df[wanted_features]
 
     # Select the last n time_steps (for LSTM input)
@@ -80,7 +106,7 @@ def analysis_predict(symbol, exchange):
     """
     standard_data, lstm_data = cook_dataset(symbol, exchange)
 
-    models_dir = "analisys/models"
+    models_dir = "/home/pedro/Studia/Projekty/AI-Trader2/AI-Trader/analisys/models"
     model_files = [os.path.join(models_dir, file) for file in os.listdir(models_dir) if file.endswith(".pkl")]
 
     predictions = []
