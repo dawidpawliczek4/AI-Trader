@@ -1,0 +1,24 @@
+Timestamps - AMD:
+2025-01-07 17:29:00
+2025-01-15 18:18:00
+
+Timestamps - APPLE:
+2025-01-07 17:29:00
+2025-01-15 18:18:00
+
+for manual: (return, opened trades)
+for other: (return, opened trades, tp hits, sl hits)
+
+amd manual
+(np.float64(0.927376450003768), 279)
+amd tpsl
+(np.float64(1.0034570022025326), 279, 69, 187)
+amd trailing
+(np.float64(1.008171219426555), 304.0, 182, 207)
+
+apple manual
+(np.float64(0.973602225864892), 335)
+apple tpsl
+(np.float64(0.9953122580888374), 335, 89, 181)
+apple trailing
+(np.float64(0.994153136797656), 375.5, 179, 213)
