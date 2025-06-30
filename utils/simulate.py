@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 import pandas as pd
-import numpy as np
 import kagglehub
 import os
 from tvDatafeed import TvDatafeed, Interval
@@ -8,29 +7,6 @@ from pytz import timezone
 import exchange_calendars as ecals
 from dotenv import load_dotenv
 from dateutil import parser
-
-'''
-    req from simulate to tactic, it will be dictionary with keys:
-        required (always present):
-            time: datatime - current datatime
-            symbol: str - ticker symbol
-            exchange: str - stock name
-            account_balance: float
-            shares: float
-            
-        optional (if they arent defined they won't be passed to tactic):
-            stop_loss: float - current stop_loss
-'''
-
-'''
-    res to simulare from tactic, it will be dictionary with keys:
-        required (always present):
-            action: str - "buy", "sell" or "hold"
-        optional:
-            quantity: float - if action is different than "hold" this key is required
-            set_stop_loss : float | None - if passed simulation will set stop-loss, if you will pass None stop-loss will be removed
-'''
-
 
 class simulate:
     '''
