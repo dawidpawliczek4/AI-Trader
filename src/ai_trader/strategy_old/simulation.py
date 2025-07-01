@@ -1,8 +1,8 @@
 import joblib
-from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import numpy as np
 import os
+from tvDatafeed import TvDatafeed, Interval
 
 def full_data(symbol = "AMD", exchange = "NASDAQ"):
     interval = Interval.in_1_minute

@@ -1,0 +1,2 @@
+# run it with: poetry run pip install --ignore-requires-python exchange_calendars
+exchange_calendars
