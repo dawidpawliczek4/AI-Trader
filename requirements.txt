@@ -1,3 +1,6 @@
+nltk
+torch
+spacy
 pandas
 numpy
 scikit-learn
@@ -5,8 +8,6 @@ matplotlib
 xgboost
 mplfinance
 seaborn
-tensorflow
 kagglehub
 git+https://github.com/rongardF/tvdatafeed.git
 dotenv
-exchange_calendars

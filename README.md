@@ -30,19 +30,55 @@ AI-Trader/
 
 ## Installation
 
-1. Clone the repository:
+After you’ve cloned the repo, you need to:
+
+1. **Install Poetry (if you don’t already have it).**
+
    ```bash
-   git clone https://github.com/Hinski2/AI-Trader.git
-   cd AI-Trader
+   curl -sSL https://install.python-poetry.org | python3 -
    ```
-2. Create and activate a virtual environment:
+
+   Make sure `poetry` is on your PATH (e.g. `export PATH="$HOME/.local/bin:$PATH"`).
+
+2. **Change into your project directory** (where `pyproject.toml` lives):
+
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+   cd ./AI-Trader
    ```
-3. Install dependencies:
+
+3. **Install all dependencies via Poetry**:
+
    ```bash
-   pip install -r requirements.txt
+   poetry install
+   ```
+
+   This will:
+
+   * Create (or reuse) a virtual environment under Poetry’s control.
+   * Read `pyproject.toml` and `poetry.lock` and install exactly the versions you specified (e.g. NumPy, etc.).
+
+4. **Activate the virtualenv shell**
+
+   ```bash
+   poetry env activate
+   ```
+
+   * That should return the command to activate virtual env.
+   * e.g. `source /Users/some_user/Library/Caches/pypoetry/virtualenvs/facexpr-Wp4LdDR0-py3.13/bin/activate`
+   * Run that command.
+
+5. **Verify that your entry-point works**. For example:
+
+   ```bash
+   poetry run python src/ai_trader/analysis/test.py
+   ```
+
+   You should see the the analysis printed in console.
+
+6. **Install exchange_calendars**:
+
+   ```bash
+   poetry run pip install --ignore-requires-python exchange_calendars
    ```
 
 ## Configuration
@@ -58,7 +94,7 @@ cp .env.exapmle .env
 
 ## NLP Sentiment Pipeline
 
-See [nlp/README.md](nlp/README.md) for details on:
+See [sentiment/README.md](nlp/README.md) for details on:
 
 - Text preprocessing (stopword removal, stemming)
 - Tokenization and encoding (BOW, embeddings, BERT)
@@ -66,7 +102,7 @@ See [nlp/README.md](nlp/README.md) for details on:
 
 ## Simulation Engine
 
-The core simulation logic lives in `utils/simulate.py`. It:
+The core simulation logic lives in `simulate/simulate.py`. It:
 
 - Streams bars or reads historical CSVs.
 - Checks exchange hours via `exchange_calendars`.
