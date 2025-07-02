@@ -1,6 +1,6 @@
 import pytest 
 from utils.tokenizer import Tokenizer
-from models import *
+from ai_trader.nlp.models import *
 
 @pytest.fixture
 def tokenizer():

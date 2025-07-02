@@ -5,7 +5,7 @@ RESET = "\033[0m"
 
 def run_demo_module():
     try:
-        from modules.demo.demo_module import run_demo
+        from ai_trader.demo.demo_module import run_demo
         run_demo()
     except ImportError as e:
         print(f"Error while importing demo module: {e}")
