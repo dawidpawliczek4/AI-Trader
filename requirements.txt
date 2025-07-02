@@ -11,3 +11,5 @@ seaborn
 kagglehub
 git+https://github.com/rongardF/tvdatafeed.git
 dotenv
+exchange_calendars
+torch

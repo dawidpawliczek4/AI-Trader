@@ -1,9 +1,10 @@
-
+from typing import List
+from ..preprocess import punctuation_removal, stem
 import nltk
 import spacy
 import numpy as np
 from typing import List
-from sentiment.preprocess import punctuation_removal, stem
+from nlp.preprocess import punctuation_removal, stem
 from nltk.data import find
 
 
@@ -28,8 +29,8 @@ class Tokenizer:
         try:
             self.nlp = spacy.load('en_core_web_lg')
         except:
-            from spacy.cli import download
-            download('en_core_web_lg')
+            from spacy.cli.download import download 
+            download('en_core_web_lg') 
             self.nlp = spacy.load('en_core_web_lg')
 
     def fit_on_sequences(self, sequences: List[str]):
@@ -69,11 +70,11 @@ class Tokenizer:
 
         ans = [0] * sequence_len
         seq = text.split()
-        for i in range(len(seq)):
-            word = seq[i]
-            ans[i] = self.tokens.get(word, 1) if self.tokens.get(
-                word, 1) < max_token_no else 1
-
+            
+        for i, word in enumerate(seq[:sequence_len]):
+            token = self.tokens.get(word, 1)
+            ans[i] = token if token < max_token_no else 1
+        
         return ans
 
     def bow_text(self, text: str, max_token_no: int) -> List[int]:
@@ -93,8 +94,8 @@ class Tokenizer:
             ans[token] += 1
 
         return ans
-
-    def word2vec_text(self, text: str) -> np.array:
+    
+    def word2vec_text(self, text: str) -> np.ndarray:
         '''
             function for converting text into vector
             input: 
@@ -102,9 +103,11 @@ class Tokenizer:
             return: 
                 np.array 300x1
         '''
-
-        return self.nlp(text).vector
-
+        
+        return np.array(self.nlp(text).vector)
+        
+        
+            
     def clean_text(self, text: str) -> str:
         '''
             function for cleaning text 
