@@ -1,35 +1,36 @@
-[project]
-name = "ai-trader"
-version = "0.1.0"
-description = "Market trading platform"
-authors = [
-    {name = "Your Name",email = "you@example.com"}
-]
-license = {text = "MIT"}
-readme = "README.md"
-requires-python = ">=3.11, <3.14"
-dependencies = [
-    "nltk (>=3.9.1,<4.0.0)",
-    "torch (>=2.7.1,<3.0.0)",
-    "spacy (>=3.8.7,<4.0.0)",
-    "pandas (>=2.3.0,<3.0.0)",
-    "numpy (>=2.3.1,<3.0.0)",
-    "scikit-learn (>=1.7.0,<2.0.0)",
-    "matplotlib (>=3.10.3,<4.0.0)",
-    "xgboost (>=3.0.2,<4.0.0)",
-    "mplfinance (>=0.12.10b0,<0.13.0)",
-    "seaborn (>=0.13.2,<0.14.0)",
-    "kagglehub (>=0.3.12,<0.4.0)",
-    "tvdatafeed @ git+https://github.com/rongardF/tvdatafeed.git",
-    "dotenv (>=0.9.9,<0.10.0)"
-]
-
 [tool.poetry]
+name        = "ai-trader"
+version     = "0.1.0"
+description = "Market trading platform"
+authors     = ["Your Name <you@example.com>"]
+license     = "MIT"
+readme      = "README.md"
 packages = [
-    { include = "ai_trader", from = "src" }
+  { include = "ai_trader", from = "src" }
 ]
 
+[tool.poetry.dependencies]
+# Python version
+python = ">=3.11,<3.14"
+
+# Core dependencies
+nltk          = ">=3.9.1,<4.0.0"
+torch         = ">=2.7.1,<3.0.0"
+spacy         = ">=3.8.7,<4.0.0"
+pandas        = ">=2.3.0,<3.0.0"
+numpy         = ">=2.3.1,<3.0.0"
+scikit-learn  = ">=1.7.0,<2.0.0"
+matplotlib    = ">=3.10.3,<4.0.0"
+xgboost       = ">=3.0.2,<4.0.0"
+mplfinance    = ">=0.12.10b0,<0.13.0"
+seaborn       = ">=0.13.2,<0.14.0"
+kagglehub     = ">=0.3.12,<0.4.0"
+tvdatafeed    = { git = "https://github.com/rongardF/tvdatafeed.git" }
+dotenv        = ">=0.9.9,<0.10.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest        = "^8.4.1"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires     = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

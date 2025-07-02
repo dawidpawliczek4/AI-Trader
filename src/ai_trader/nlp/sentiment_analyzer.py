@@ -68,19 +68,19 @@ class Sentiment_analyzer():
             self.SEQUENCE_LEN = longest_sequence(X)
 
             self.tokenizer.fit_on_sequences(self.X_train)
-            self.X_train = [self.tokenizer.ibe_text(
-                text=x, max_token_no=self.MAX_TOKEN_NO, sequence_len=self.SEQUENCE_LEN) for x in self.X_train]
-            self.X_test = [self.tokenizer.ibe_text(
-                text=x, max_token_no=self.MAX_TOKEN_NO, sequence_len=self.SEQUENCE_LEN) for x in self.X_test]
+            self.X_train = np.array([self.tokenizer.ibe_text(
+                text=x, max_token_no=self.MAX_TOKEN_NO, sequence_len=self.SEQUENCE_LEN) for x in self.X_train])
+            self.X_test = np.array([self.tokenizer.ibe_text(
+                text=x, max_token_no=self.MAX_TOKEN_NO, sequence_len=self.SEQUENCE_LEN) for x in self.X_test])
 
         elif self.text_transformation == self.tokenizer.bow_text:
             self.MAX_TOKEN_NO = 5000
 
             self.tokenizer.fit_on_sequences(self.X_train)
-            self.X_train = [self.tokenizer.bow_text(
-                text=x, max_token_no=self.MAX_TOKEN_NO) for x in self.X_train]
-            self.X_test = [self.tokenizer.bow_text(
-                text=x, max_token_no=self.MAX_TOKEN_NO) for x in self.X_test]
+            self.X_train = np.array([self.tokenizer.bow_text(
+                text=x, max_token_no=self.MAX_TOKEN_NO) for x in self.X_train])
+            self.X_test = np.array([self.tokenizer.bow_text(
+                text=x, max_token_no=self.MAX_TOKEN_NO) for x in self.X_test])
 
         elif self.text_transformation == self.tokenizer.word2vec_text:
             self.X_train = [self.tokenizer.word2vec_text(
