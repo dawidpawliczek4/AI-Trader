@@ -7,69 +7,47 @@ from pytz import timezone
 import exchange_calendars as ecals
 from dotenv import load_dotenv
 from dateutil import parser
+from ai_trader.strategy.base.historical_strategy import HistoricalStrategy
+from ai_trader.strategy.base.live_strategy import LiveStrategy
+from typing import TypeGuard
+
+def is_live_strategy(s: LiveStrategy | HistoricalStrategy) -> TypeGuard[LiveStrategy]:
+    return s.get_live()
+
+def is_historical_strategy(s: LiveStrategy | HistoricalStrategy) -> TypeGuard[HistoricalStrategy]:
+    return not s.get_live()
 
 class simulate:
     '''
-        class for evaluating tactic: 
-        
-            input for version live:
-                * live: bool = True
-                * n_bars: bars number
-                * interval: type Interval from tvDatafeed
-                * tactic: function for making decisions
-                * symbol: ticker 
-                * exchange: stock name
-                * stop-loss: flaot if you want to set it, none if not
-            
-            input for version on historical data (2021 year):
-                * live: bool = False 
-                * t0: start time of simulation
-                * t1: end time of simulation
-                * delta: time delta between using tactic
-                * tactic: function for making decisions
-                * symbol: ticker
-                * exchange: stock name
-                * stop-loss: flaot if you want to set it, none if not
-                
-            tactic - function that: 
-                * receive req
-                * have to return res
-                    
-            important info: 
-                * we assume that we are in the et timezone. so proper example of datatime is (2021-01-04 04:00:00-05:00) or (2021-03-24 08:00:00-04:00)
     '''
     
     accout_ballance = 100000
     shares = 0
     
-    def __init__(self, live: bool, symbol: str, exchange: str, tactic, stop_loss: float = None, n_bars: int = None, interval: Interval = None, t0: datetime = None, t1: datetime = None, delta: timedelta = None):
+    def __init__(self, strategy: HistoricalStrategy | LiveStrategy):
         load_dotenv()
+        self.live = strategy.get_live()
+        self.symbol = strategy.get_symbol()
+        self.exchange = strategy.get_exchange() 
+        self.stop_loss = strategy.get_stop_loss()
         
         # set data
-        if live:
-            self.live = live 
-            self.n_bars = n_bars
-            self.interval = interval 
-            self.tactic = tactic 
-            self.symbol = symbol
-            self.exchange = exchange
-            self.delta = self.timedeltaOfInterval(interval)
-            self.stop_loss = stop_loss
+        if is_live_strategy(strategy):
+            self.n_bars = strategy.get_n_bars()
+            self.interval = strategy.get_interval()
             
-        else: 
-            self.live = live 
-            self.t0 = t0 
-            self.t1 = t1 
-            self.delta = delta 
-            self.tactic = tactic 
-            self.symbol = symbol 
-            self.exchange = exchange
-            self.stop_loss = stop_loss
+        elif is_historical_strategy(strategy):
+            self.t0 = strategy.get_t0()
+            self.t1 = strategy.get_t1()
+            self.delta = strategy.get_delta()
+            
+        else:
+            raise ValueError("Unsupported strategy type. Use LiveStrategy or HistoricalStrategy.")
         
         # cook dataset 
         self.cook_stock_dataset()
         
-    def timedeltaOfInterval(interval):
+    def timedeltaOfInterval(self, interval: Interval) -> timedelta:
         if interval == Interval.in_1_minute:
             return timedelta(minutes=1)
         elif interval == Interval.in_3_minute:
@@ -99,7 +77,7 @@ class simulate:
         else:
             raise ValueError(f"Unsupported interval: {interval}")
         
-    def is_nasdaq_open(date: datetime) -> bool:
+    def is_nasdaq_open(self, date: datetime) -> bool:
         '''
             method for checking if nasdaq is open in the given datetime
         '''

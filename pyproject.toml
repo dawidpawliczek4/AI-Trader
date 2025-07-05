@@ -31,6 +31,8 @@ fastapi = "^0.115.14"
 uvicorn = "^0.35.0"
 pydantic-settings = "^2.10.1"
 transformers = "^4.30.0"
+exchange-calendars = "^4.10.1"
+mypy = "^1.16.1"
 
 [tool.poetry.scripts]
 serve = "ai_trader.core_api.server:main"
