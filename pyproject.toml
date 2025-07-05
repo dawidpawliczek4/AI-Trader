@@ -11,7 +11,7 @@ packages = [
 
 [tool.poetry.dependencies]
 # Python version
-python = ">=3.11,<3.14"
+python = ">=3.12, <3.13"
 
 # Core dependencies
 nltk          = ">=3.9.1,<4.0.0"
@@ -27,6 +27,13 @@ seaborn       = ">=0.13.2,<0.14.0"
 kagglehub     = ">=0.3.12,<0.4.0"
 tvdatafeed    = { git = "https://github.com/rongardF/tvdatafeed.git" }
 dotenv        = ">=0.9.9,<0.10.0"
+fastapi = "^0.115.14"
+uvicorn = "^0.35.0"
+pydantic-settings = "^2.10.1"
+transformers = "^4.30.0"
+
+[tool.poetry.scripts]
+serve = "ai_trader.core_api.server:main"
 
 [tool.poetry.group.dev.dependencies]
 pytest        = "^8.4.1"

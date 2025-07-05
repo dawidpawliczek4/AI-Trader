@@ -1,11 +1,9 @@
-from typing import List
-from ..preprocess import punctuation_removal, stem
 import nltk
 import spacy
 import numpy as np
-from typing import List
-from nlp.preprocess import punctuation_removal, stem
 from nltk.data import find
+from typing import List
+from ai_trader.nlp.preprocess import punctuation_removal, stem
 
 
 class Tokenizer:
