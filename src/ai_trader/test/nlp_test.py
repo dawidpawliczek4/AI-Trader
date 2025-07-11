@@ -6,10 +6,12 @@ import time
 sys.dont_write_bytecode = True
 sys.path.append(os.path.abspath('..'))
 
-from ai_trader.nlp import Sentiment_analyzer
+from ai_trader.nlp.sentiment_analyzer import Sentiment_analyzer
 
-word_transformations = ['bow', 'ibe', 'word2vec']
-models = ['linear_regression']
+word_transformations = ['ibe']
+
+# models = ['linear_regression', 'decision_tree_regression', 'knn_regression', 'nn']
+models = ['nn']
 
 for wt in word_transformations:
     for model in models:

@@ -26,19 +26,19 @@ class Nn_regression(torch.nn.Module, BaseModel):
         criterion = torch.nn.L1Loss()
         optimizer = torch.optim.SGD(self.parameters(), lr = 0.001)
         
-        X = torch.tensor(X_train, dtype=torch.float32)
+        X = X_train
         y = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
         
         for epoch in range(EPOCHS):
             optimizer.zero_grad()
             
-            y_pred = self(X)
+            y_pred = self.forward(X)
             loss = criterion(y_pred, y)
             loss.backward()
             optimizer.step()
             
             if(epoch % 50 == 0):
-                print('epoch: ', epoch)
+                print(f'epoch: {epoch}, loss: {loss.item():.4f}')
             
     def predict(self, X_test: ndarray) -> ndarray:
-        return self.forward(X_test).detach().numpy()
+        return self.forward(X_test).detach().numpy().squeeze(1)

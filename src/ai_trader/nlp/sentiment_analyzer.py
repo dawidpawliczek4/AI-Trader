@@ -62,6 +62,10 @@ class Sentiment_analyzer():
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             X, y, test_size=0.25, random_state=42
         )
+        
+        self.y_train = np.array(self.y_train) 
+        self.y_test = np.array(self.y_test).reshape(-1, 1)
+        
         # encode data
         if self.text_transformation == self.tokenizer.ibe_text:
             self.MAX_TOKEN_NO = 5000
@@ -83,10 +87,10 @@ class Sentiment_analyzer():
                 text=x, max_token_no=self.MAX_TOKEN_NO) for x in self.X_test])
 
         elif self.text_transformation == self.tokenizer.word2vec_text:
-            self.X_train = [self.tokenizer.word2vec_text(
-                text=x) for x in self.X_train]
-            self.X_test = [self.tokenizer.word2vec_text(
-                text=x) for x in self.X_test]
+            self.X_train = np.array([self.tokenizer.word2vec_text(
+                text=x) for x in self.X_train])
+            self.X_test = np.array([self.tokenizer.word2vec_text(
+                text=x) for x in self.X_test])
 
             self.X_train = np.array(self.X_train, dtype=np.float32)
             self.X_test = np.array(self.X_test, dtype=np.float32)
@@ -106,7 +110,7 @@ class Sentiment_analyzer():
         elif self.modelClass == Nn_regression:
             if self.text_transformation == self.tokenizer.ibe_text:
                 self.model = Nn_regression(
-                    [self.SEQUENCE_LEN, 500, 100, 1], epochs=2000)
+                    [self.SEQUENCE_LEN, 500, 100, 1], epochs=750)
 
             elif self.text_transformation == self.tokenizer.bow_text:
                 self.model = Nn_regression([5000, 100, 50, 1], epochs=2000)
@@ -155,11 +159,9 @@ class Sentiment_analyzer():
             return: 
                 dictionary {metrices: score}
         '''
-        
-        if self.X_test is None or type(self.X_test) != np.ndarray or type(self.y_test) != np.ndarray:
+        if self.X_test is None:
             raise ValueError("Model has not been trained yet. Please call fit() before evaluate().")
-         
-        y_pred = self.model.predict(self.X_test)
+        y_pred = np.array([self.model.predict(x.reshape(1, -1)) for x in self.X_test])
         
         return {
             "mse": mse(y_pred, self.y_test),

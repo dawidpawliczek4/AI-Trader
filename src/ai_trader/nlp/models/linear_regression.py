@@ -10,5 +10,4 @@ class Linear_regression(BaseModel):
         self.model.fit(X_train, y_train)
         
     def predict(self, X_test: ndarray) -> ndarray:
-        X_test = X_test.reshape(1, -1) 
         return self.model.predict(X_test)
