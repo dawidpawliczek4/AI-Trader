@@ -38,22 +38,37 @@ class Sentiment_analyzer():
         if model not in ["decision_tree_regression", "knn_regression", "linear_regression", "nn"]:
             raise ValueError("Invalid model type. Choose from 'decision_tree_regression', 'knn_regression', 'linear_regression', or 'nn'.")
         
-    def fit(self):
+    def fit(self, custom_X: List[str] | None = None, custom_y: List[float] | None = None):
         '''
-            before making predictions use this function. Don't pass any arguments, 
-            everything will be handle for you.
+            before making predictions use this function. If 
             input:
-                Nothing
+                custom_X: List[str] | None: custom input data, if None then use dataset.csv
+                custom_y: List[float] | None: custom labels, if None then use dataset.csv
+            if custom_X and custom_y are provided, they will be used instead of the dataset.csv
+            if custom_X and custom_y are None, then dataset.csv will be used
+            if custom_X and custom_y are provided, they must have the same length
             return:
                 Nothing
         '''
+        # validate custom input
+        if custom_X is not None and custom_y is None:
+            raise ValueError("If custom_X is provided, custom_y must also be provided.")
+        if custom_y is not None and custom_X is None:
+            raise ValueError("If custom_y is provided, custom_X must also be provided.")
+        if custom_X is not None and custom_y is not None:
+            if len(custom_X) != len(custom_y):
+                raise ValueError("custom_X and custom_y must have the same length.")
+        
+        # prepare data 
+        if custom_X is None:
+            # get data
+            dir = os.path.dirname(os.path.abspath(__file__))
+            df_path = os.path.join(dir, 'dataset.csv')
 
-        # get data
-        dir = os.path.dirname(os.path.abspath(__file__))
-        df_path = os.path.join(dir, 'dataset.csv')
-
-        df = pd.read_csv(df_path)
-        X, y = df['Headline'].tolist(), df['Sentiment'].tolist()
+            df = pd.read_csv(df_path)
+            X, y = df['Headline'].tolist(), df['Sentiment'].tolist()
+        else: 
+            X, y = custom_X, custom_y
 
         # clean data
         X = [self.tokenizer.clean_text(x) for x in X]
@@ -137,19 +152,18 @@ class Sentiment_analyzer():
         
         # encode data 
         if self.text_transformation == self.tokenizer.ibe_text:
-            Xlli = [self.tokenizer.ibe_text(text=x, max_token_no=self.MAX_TOKEN_NO, sequence_len=self.SEQUENCE_LEN) for x in Xls]
+            Xna = np.array([self.tokenizer.ibe_text(text=x, max_token_no=self.MAX_TOKEN_NO, sequence_len=self.SEQUENCE_LEN) for x in Xls])
             
         elif self.text_transformation == self.tokenizer.bow_text:
-            
-            Xlli = [self.tokenizer.bow_text(text=x, max_token_no=self.MAX_TOKEN_NO) for x in Xls]
+            Xna = np.array([self.tokenizer.bow_text(text=x, max_token_no=self.MAX_TOKEN_NO) for x in Xls])
             
         elif self.text_transformation == self.tokenizer.word2vec_text:
-            Xlli = [self.tokenizer.word2vec_text(text=x) for x in Xls]
+            Xna = np.array([self.tokenizer.word2vec_text(text=x) for x in Xls])
+            
         else:
             raise ValueError("Invalid text transformation method")
             
-        Xna = np.array(Xlli) 
-        return self.model.predict(Xna).tolist()
+        return [self.model.predict(x.reshape(1, -1))[0] for x in Xna]
          
     def evaluate(self):
         '''
