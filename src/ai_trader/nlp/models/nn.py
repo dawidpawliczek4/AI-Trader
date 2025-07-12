@@ -42,3 +42,10 @@ class Nn_regression(torch.nn.Module, BaseModel):
             
     def predict(self, X_test: ndarray) -> ndarray:
         return self.forward(X_test).detach().numpy().squeeze(1)
+
+    def load(self, path: str):
+        self.load_state_dict(torch.load(path, map_location='cpu'))
+        self.eval()  # Set model to evaluation mode
+
+    def save(self, path: str):
+        torch.save(self.state_dict(), path)

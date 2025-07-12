@@ -33,6 +33,7 @@ pydantic-settings = "^2.10.1"
 transformers = "^4.30.0"
 exchange-calendars = "^4.10.1"
 mypy = "^1.16.1"
+evaluate = "^0.4.5"
 
 [tool.poetry.scripts]
 serve = "ai_trader.core_api.server:main"

@@ -1,6 +1,7 @@
 from sklearn.neighbors import KNeighborsRegressor
 from .base_model import BaseModel
 from numpy import ndarray
+import joblib
 
 class Knn_regression(BaseModel):
     def __init__(self, **kwargs):
@@ -12,3 +13,9 @@ class Knn_regression(BaseModel):
     def predict(self, X_test: ndarray) -> ndarray:
         X_test = X_test.reshape(1, -1)
         return self.model.predict(X_test)
+    
+    def load(self, path: str):
+        self.model = joblib.load(path)
+
+    def save(self, path: str):
+        joblib.dump(self.model, path)
