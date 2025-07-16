@@ -11,7 +11,7 @@ from transformers import (
     TrainingArguments,
 )
 from torch.utils.data import DataLoader
-from src.ai_trader.nlp.data.load_data import make_dataloaders
+from ai_trader.nlp.data.load_data import make_dataloaders
 
 def train_finbert(
     dataloaders: Dict[str, DataLoader],
@@ -45,6 +45,7 @@ def train_finbert(
         base_model,
         num_labels=1,
         problem_type="regression",
+        ignore_mismatched_sizes=True,
     ).to(device)
 
     train_ds = dataloaders["train"].dataset
@@ -67,7 +68,7 @@ def train_finbert(
         per_device_train_batch_size=dataloaders["train"].batch_size,
         per_device_eval_batch_size=dataloaders["val"].batch_size,
         weight_decay=weight_decay,
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
         metric_for_best_model="pearson",
