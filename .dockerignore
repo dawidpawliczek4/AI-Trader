@@ -1,0 +1,72 @@
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*
+
+# Environment files
+.env
+.env.local
+.env.docker
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Data and models
+*.pkl
+*.pth
+*.h5
+*.model
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Test coverage
+.coverage
+htmlcov/
+
+# Cache
+.cache/
+.pytest_cache/
+
+# Temporary files
+*.tmp
+*.temp

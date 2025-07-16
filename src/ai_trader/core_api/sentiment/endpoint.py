@@ -1,7 +1,7 @@
 import asyncio
 from fastapi import APIRouter
 from pydantic import BaseModel
-from ai_trader.core_api.sentiment.services import predict_sentiment
+from ai_trader.core_api.sentiment.services.predict import predict_sentiment
 
 router = APIRouter()
 

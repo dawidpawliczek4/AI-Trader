@@ -34,6 +34,9 @@ transformers = {extras = ["torch"], version = "^4.53.2"}
 exchange-calendars = "^4.10.1"
 mypy = "^1.16.1"
 evaluate = "^0.4.5"
+celery = {extras = ["redis"], version = "^5.5.3"}
+flower = "^2.0.1"
+aioredis = "^2.0.1"
 
 [tool.poetry.scripts]
 serve = "ai_trader.core_api.server:main"
